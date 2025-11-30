@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EntityController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContactFunctionController;
+use App\Http\Controllers\ItemController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -58,5 +59,8 @@ Route::middleware([
     Route::get('/contact-functions/{func}/edit', [ContactFunctionController::class, 'edit'])->name('functions.edit');
     Route::put('/contact-functions/{func}', [ContactFunctionController::class, 'update'])->name('functions.update');
     Route::delete('/contact-functions/{func}', [ContactFunctionController::class, 'destroy'])->name('functions.destroy');
+
+
+    Route::resource('items', ItemController::class);
 
 });
