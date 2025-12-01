@@ -7,6 +7,7 @@ use App\Http\Controllers\ContactFunctionController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\ProposalLineController;
+use App\Http\Controllers\OrderController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -68,4 +69,17 @@ Route::middleware([
     Route::resource('proposals', ProposalController::class);
 
     Route::resource('proposal-lines', ProposalLineController::class);
+
+    Route::resource('orders', OrderController::class);
+
+    // Converter proposta → encomenda
+    Route::post('/proposals/{proposal}/convert-to-order', [ProposalController::class, 'convertToOrder'])
+        ->name('proposals.convertToOrder');
+
+    // Converter encomenda → encomendas fornecedor
+    Route::post('/orders/{order}/convert-to-supplier-orders', [OrderController::class, 'convertToSupplierOrders'])
+        ->name('orders.convertToSupplierOrders');
+
+    // Download PDF
+    Route::get('/orders/{order}/pdf', [OrderController::class, 'pdf'])->name('orders.pdf');
 });
