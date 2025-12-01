@@ -5,6 +5,8 @@ use App\Http\Controllers\EntityController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContactFunctionController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ProposalController;
+use App\Http\Controllers\ProposalLineController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -63,4 +65,7 @@ Route::middleware([
 
     Route::resource('items', ItemController::class);
 
+    Route::resource('proposals', ProposalController::class);
+
+    Route::resource('proposal-lines', ProposalLineController::class);
 });

@@ -31,11 +31,12 @@
                     <x-nav-link href="{{ route('items.index') }}" :active="request()->routeIs('items.*')">
                         Items
                     </x-nav-link>
+                    <x-nav-link href="{{ route('proposals.index') }}" :active="request()->routeIs('proposals.*')">
+                        Business Proposals
+                    </x-nav-link>
 
                     {{-- 
-                    <x-nav-link href="{{ route('proposals.index') }}" :active="request()->routeIs('proposals.*')">
-                        Proposals
-                    </x-nav-link>
+                    
 
                     <x-nav-link href="{{ route('calendar.index') }}" :active="request()->routeIs('calendar.*')">
                         Calendar
@@ -83,11 +84,12 @@
             <x-responsive-nav-link href="{{ route('items.index') }}" :active="request()->routeIs('items.*')">
                 Items
             </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('proposals.index') }}" :active="request()->routeIs('proposals.*')">
+                Business Proposals
+            </x-responsive-nav-link>
 
             {{--
-            <x-responsive-nav-link href="{{ route('proposals.index') }}" :active="request()->routeIs('proposals.*')">
-                Proposals
-            </x-responsive-nav-link>
+
             <x-responsive-nav-link href="{{ route('calendar.index') }}" :active="request()->routeIs('calendar.*')">
                 Calendar
             </x-responsive-nav-link>
