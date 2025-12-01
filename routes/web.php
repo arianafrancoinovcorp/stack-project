@@ -8,6 +8,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\ProposalLineController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\CalendarController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -82,4 +83,12 @@ Route::middleware([
 
     // Download PDF
     Route::get('/orders/{order}/pdf', [OrderController::class, 'pdf'])->name('orders.pdf');
+
+    Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
+    Route::get('calendar/events', [CalendarController::class, 'events'])->name('calendar.events');
+    Route::get('calendar/create', [CalendarController::class, 'create'])->name('calendar.create');
+    Route::post('calendar', [CalendarController::class, 'store'])->name('calendar.store');
+    Route::get('calendar/{activity}/edit', [CalendarController::class, 'edit'])->name('calendar.edit');
+    Route::put('calendar/{activity}', [CalendarController::class, 'update'])->name('calendar.update');
+    Route::delete('calendar/{activity}', [CalendarController::class, 'destroy'])->name('calendar.destroy');
 });
