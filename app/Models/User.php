@@ -13,29 +13,17 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens;
-
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
@@ -43,25 +31,63 @@ class User extends Authenticatable
         'two_factor_secret',
     ];
 
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
-     */
     protected $appends = [
         'profile_photo_url',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function tenants()
+    {
+        return $this->belongsToMany(Tenant::class)
+        ->withPivot('role')
+        ->withTimestamps();
+    }
+
+    public function ownedTenants()
+    {
+        return $this->hasMany(Tenant::class, 'owner_id');
+    }
+   
+    public function hasAccessToTenant($tenantId)
+    {
+        return $this->tenants()->where('tenant_id', $tenantId)->exists();
+    }
+
+    
+    public function isOwnerOf($tenantId)
+    {
+        return $this->tenants()
+            ->where('tenant_id', $tenantId)
+            ->wherePivot('role', 'owner')
+            ->exists();
+    }
+
+   
+    public function isAdminOf($tenantId)
+    {
+        return $this->tenants()
+            ->where('tenant_id', $tenantId)
+            ->wherePivot('role', 'admin')
+            ->exists();
+    }
+
+    
+    public function roleInTenant($tenantId)
+    {
+        $tenant = $this->tenants()->where('tenant_id', $tenantId)->first();
+        return $tenant?->pivot->role;
+    }
+
+    
+    public function canManageTenant($tenantId)
+    {
+        return $this->isOwnerOf($tenantId) || $this->isAdminOf($tenantId);
     }
 }

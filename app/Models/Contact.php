@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\BelongsToTenant;
 
 class Contact extends Model
 {
     use HasFactory;
+    use BelongsToTenant;
 
     protected $fillable = [
         'entity_id', 'first_name', 'last_name', 'function_id', 

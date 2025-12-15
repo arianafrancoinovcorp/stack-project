@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\BelongsToTenant;
 
 class CalendarAction extends Model
 {
+
+    use BelongsToTenant;
+
     protected $fillable = ['name', 'description'];
     protected $table = 'calendar_actions';
 

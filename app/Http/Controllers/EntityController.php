@@ -11,28 +11,29 @@ class EntityController extends Controller
 {
     // Index
     public function index(Request $request)
-{
-    $type = $request->get('type', 'client');
-    $search = $request->get('search', '');
+    {
+        $type = $request->get('type', 'client');
+        $search = $request->get('search', '');
 
-    $query = Entity::with('country', 'types')
-        ->whereHas('types', fn($q) => $q->where('name', $type));
+        $query = Entity::with('country', 'types')
+            ->whereHas('types', fn ($q) => $q->where('name', $type));
 
-   
-    if (!empty($search)) {
-        $query->where(function($q) use ($search) {
-            $q->where('name', 'like', "%$search%")
-              ->orWhere('nif', 'like', "%$search%")
-              ->orWhere('phone', 'like', "%$search%")
-              ->orWhere('mobile', 'like', "%$search%");
-        });
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('nif', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%")
+                    ->orWhere('mobile', 'like', "%$search%");
+            });
+        }
+
+        $entities = $query
+            ->orderBy('id', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('entities.index', compact('entities', 'type', 'search'));
     }
-
-    
-    $entities = $query->orderBy('id', 'desc')->paginate(15)->withQueryString();
-
-    return view('entities.index', compact('entities', 'type', 'search'));
-}
 
     // Create
     public function create(Request $request)
@@ -54,6 +55,7 @@ class EntityController extends Controller
         $validated = $request->validate([
             'types' => 'required|array|min:1',
             'types.*' => 'exists:types,id',
+
             'nif' => 'required|unique:entities,nif',
             'name' => 'required|string|max:255',
             'address' => 'nullable|string|max:255',
@@ -69,62 +71,80 @@ class EntityController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
+        // separar types (pivot)
+        $types = $validated['types'];
+        unset($validated['types']);
+
+        // criar entity
         $entity = Entity::create($validated);
-        $entity->types()->sync($validated['types']);
 
-        $firstType = Type::find($validated['types'][0])->name;
+        // sync pivot
+        $entity->types()->sync($types);
 
-        return redirect()->route('entities.index', ['type' => $firstType])
+        $firstType = Type::find($types[0])->name ?? 'client';
+
+        return redirect()
+            ->route('entities.index', ['type' => $firstType])
             ->with('success', 'Entity created successfully.');
     }
 
     // Edit
     public function edit(Entity $entity)
-{
-    $countries = Country::orderBy('name')->get();
-    $types = Type::orderBy('name')->get(); 
-    $entity->load('types'); 
-    $mode = 'edit';                
+    {
+        $countries = Country::orderBy('name')->get();
+        $types = Type::orderBy('name')->get();
+        $entity->load('types');
+        $mode = 'edit';
 
-    return view('entities.edit', compact('entity', 'countries', 'types', 'mode'));
-}
+        return view('entities.edit', compact('entity', 'countries', 'types', 'mode'));
+    }
 
     // Update
     public function update(Request $request, Entity $entity)
-{
-    $validated = $request->validate([
-        'types' => 'required|array|min:1',
-        'types.*' => 'exists:types,id',
-        'nif' => 'required|unique:entities,nif,' . $entity->id,
-        'name' => 'required|string|max:255',
-        'address' => 'nullable|string|max:255',
-        'zip_code' => 'nullable|string|max:10',
-        'city' => 'nullable|string|max:255',
-        'country_id' => 'nullable|exists:countries,id',
-        'phone' => 'nullable|string|max:20',
-        'mobile' => 'nullable|string|max:20',
-        'website' => 'nullable|url|max:255',
-        'email' => 'nullable|email|max:255',
-        'rgpd_consent' => 'boolean',
-        'notes' => 'nullable|string',
-        'status' => 'required|in:active,inactive',
-    ]);
+    {
+        $validated = $request->validate([
+            'types' => 'required|array|min:1',
+            'types.*' => 'exists:types,id',
 
-    $entity->update($validated);
+            'nif' => 'required|unique:entities,nif,' . $entity->id,
+            'name' => 'required|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'zip_code' => 'nullable|string|max:10',
+            'city' => 'nullable|string|max:255',
+            'country_id' => 'nullable|exists:countries,id',
+            'phone' => 'nullable|string|max:20',
+            'mobile' => 'nullable|string|max:20',
+            'website' => 'nullable|url|max:255',
+            'email' => 'nullable|email|max:255',
+            'rgpd_consent' => 'boolean',
+            'notes' => 'nullable|string',
+            'status' => 'required|in:active,inactive',
+        ]);
 
-    $entity->types()->sync($validated['types']);
+        // separar types (pivot)
+        $types = $validated['types'];
+        unset($validated['types']);
 
-    $redirectType = $entity->types->first()->name ?? 'client';
+        // update entity
+        $entity->update($validated);
 
-    return redirect()->route('entities.index', ['type' => $redirectType])
-                     ->with('success', 'Entity updated successfully.');
-}
+        // sync pivot
+        $entity->types()->sync($types);
+
+        $redirectType = $entity->types->first()->name ?? 'client';
+
+        return redirect()
+            ->route('entities.index', ['type' => $redirectType])
+            ->with('success', 'Entity updated successfully.');
+    }
+
     // Delete
     public function destroy(Entity $entity)
     {
         $entity->delete();
 
-        return redirect()->route('entities.index')
+        return redirect()
+            ->route('entities.index')
             ->with('success', 'Entity deleted successfully.');
     }
 }

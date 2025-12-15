@@ -9,6 +9,7 @@ use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\ProposalLineController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\TenantController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -91,4 +92,14 @@ Route::middleware([
     Route::get('calendar/{activity}/edit', [CalendarController::class, 'edit'])->name('calendar.edit');
     Route::put('calendar/{activity}', [CalendarController::class, 'update'])->name('calendar.update');
     Route::delete('calendar/{activity}', [CalendarController::class, 'destroy'])->name('calendar.destroy');
+
+
+    // Tenant routes
+    Route::get('/tenants', [TenantController::class, 'index'])->name('tenants.index');
+    Route::get('/tenants/create', [TenantController::class, 'create'])->name('tenants.create');
+    Route::post('/tenants', [TenantController::class, 'store'])->name('tenants.store');
+    Route::get('/tenants/{tenant}/edit', [TenantController::class, 'edit'])->name('tenants.edit');
+    Route::put('/tenants/{tenant}', [TenantController::class, 'update'])->name('tenants.update');
+    Route::get('/tenants/{tenant}/switch', [TenantController::class, 'switch'])->name('tenants.switch');
+
 });

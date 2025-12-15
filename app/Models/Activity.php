@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\BelongsToTenant;
 
 class Activity extends Model
 {
+    use BelongsToTenant;
     protected $fillable = [
         'date', 'time', 'duration', 'user_id', 'knowledge_id',
         'entity_id', 'type_id', 'action_id', 'description', 
