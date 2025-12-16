@@ -11,6 +11,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\PlanController;
+use App\Http\Controllers\SubscriptionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -110,6 +112,19 @@ Route::middleware([
         Route::post('/team', [OnboardingController::class, 'team'])->name('team');
         Route::post('/preferences', [OnboardingController::class, 'preferences'])->name('preferences');
         Route::post('/skip', [OnboardingController::class, 'skip'])->name('skip');
+    });
+    // Plans routes
+    Route::get('/plans', [PlanController::class, 'index'])->name('plans.index');
+    Route::get('/plans/{plan}', [PlanController::class, 'show'])->name('plans.show');
+
+    // Subscription routes
+    Route::prefix('subscription')->name('subscriptions.')->group(function () {
+        Route::get('/dashboard', [SubscriptionController::class, 'dashboard'])->name('dashboard');
+        Route::post('/subscribe/{plan}', [SubscriptionController::class, 'subscribe'])->name('subscribe');
+        Route::post('/upgrade/{plan}', [SubscriptionController::class, 'upgrade'])->name('upgrade');
+        Route::post('/downgrade/{plan}', [SubscriptionController::class, 'downgrade'])->name('downgrade');
+        Route::post('/cancel', [SubscriptionController::class, 'cancel'])->name('cancel');
+        Route::post('/resume', [SubscriptionController::class, 'resume'])->name('resume');
     });
 
 });

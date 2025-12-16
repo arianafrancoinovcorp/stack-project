@@ -70,6 +70,9 @@
                     <x-nav-link href="{{ route('calendar.index') }}" :active="request()->routeIs('calendar.*')">
                         Calendar
                     </x-nav-link>
+                    <x-nav-link href="{{ route('subscriptions.dashboard') }}" :active="request()->routeIs('subscriptions.*')">
+                        Billing
+                    </x-nav-link>
                 </div>
             </div>
 
