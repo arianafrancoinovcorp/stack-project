@@ -27,13 +27,16 @@ class TenantController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
         $data['slug'] = Str::slug($data['name']) . '-' . Str::random(6);
         $data['owner_id'] = $user->id;
+        $data['status'] = 'trial';
+        $data['trial_ends_at'] = \Carbon\Carbon::now()->addDays(14);
+        $data['onboarding_completed'] = false; 
 
         $tenant = Tenant::create($data);
 
@@ -43,15 +46,14 @@ class TenantController extends Controller
         // Switch to new tenant
         session(['tenant_id' => $tenant->id]);
 
-        return redirect()->route('dashboard')
+        return redirect()->route('onboarding.index') 
             ->with('success', 'Tenant created successfully!');
     }
-
     public function switch($id)
     {
         /** @var User $user */
         $user = Auth::user();
-        
+
         // Verify user has access to this tenant
         if (!$user->tenants()->where('tenant_id', $id)->exists()) {
             abort(403, 'You do not have access to this tenant.');
@@ -66,10 +68,10 @@ class TenantController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        
+
         // Check if user is owner or admin
         $userRole = $tenant->users()->where('user_id', $user->id)->first()?->pivot->role;
-        
+
         if (!in_array($userRole, ['owner', 'admin'])) {
             abort(403, 'Only owners and admins can edit tenant settings.');
         }
@@ -81,10 +83,10 @@ class TenantController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        
+
         // Check if user is owner or admin
         $userRole = $tenant->users()->where('user_id', $user->id)->first()?->pivot->role;
-        
+
         if (!in_array($userRole, ['owner', 'admin'])) {
             abort(403, 'Only owners and admins can edit tenant settings.');
         }

@@ -5,6 +5,7 @@ namespace App\Listeners;
 use Illuminate\Auth\Events\Registered;
 use App\Models\Tenant;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class CreateFirstTenant
 {
@@ -17,6 +18,8 @@ class CreateFirstTenant
             'slug' => Str::slug($user->name . '-workspace-' . Str::random(6)),
             'owner_id' => $user->id,
             'status' => 'trial',
+            'trial_ends_at' => Carbon::now()->addDays(14),
+            'onboarding_completed' => false, 
         ]);
 
         // user as owner

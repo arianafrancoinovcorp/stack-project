@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             \App\Http\Middleware\SetTenant::class,
+            \App\Http\Middleware\CheckOnboarding::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

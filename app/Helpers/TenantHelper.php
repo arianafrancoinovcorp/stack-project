@@ -5,9 +5,14 @@ use App\Models\User;
 if (!function_exists('tenant')) {
     function tenant()
     {
+        if (!app()->bound('tenant')) {
+            return null;
+        }
+
         return app('tenant');
     }
 }
+
 
 if (!function_exists('currentTenantId')) {
     function currentTenantId()
